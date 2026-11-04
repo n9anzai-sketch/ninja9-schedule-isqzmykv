@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>忍者ナイン 月間スケジュール</title>
+<style>
+:root{--bg:#f5f6f9;--card:#fff;--text:#1f2937;--sub:#6b7280;--navy:#1f2b73;--line:#e5e7eb}
+@media (prefers-color-scheme:dark){:root{--bg:#111318;--card:#1b1e26;--text:#e5e7eb;--sub:#9ca3af;--navy:#9fb0ff;--line:#2a2f3a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic UI",sans-serif;line-height:1.6}
+main{max-width:860px;margin:0 auto;padding:16px}
+h1{font-size:1.25rem;color:var(--navy);margin:8px 0 4px}h2{font-size:1.05rem;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+img{width:100%;height:auto;border-radius:8px;display:block;margin:6px 0}
+.sub{color:var(--sub);font-size:.85rem}a{color:var(--navy)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.tabs button{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:6px 14px;font-size:.95rem}
+.tabs button.on{background:var(--navy);color:var(--card);border-color:var(--navy)}
+</style></head><body><main>
+<h1>📅 忍者ナイン 月間スケジュール</h1>
+<div class="sub">スタッフ用。画像を長押しすると保存できます。<span id="upd"></span></div>
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+<div id="flyers"></div>
+</main>
+<script>
+const ym=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+const label=k=>{const [y,m]=k.split("-");return y+"年"+Number(m)+"月"};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+fetch("manifest.json?t="+Date.now()).then(r=>r.json()).then(m=>{
+  document.getElementById("upd").textContent="（更新: "+m.updated+"）";
+  const now=new Date(),cur=ym(now),next=ym(new Date(now.getFullYear(),now.getMonth()+1,1));
+  let keys=Object.keys(m.months).sort().filter(k=>k>=cur);
+  if(!keys.length) keys=Object.keys(m.months).sort().slice(-1);
+  const tabs=document.getElementById("tabs"),view=document.getElementById("view");
+  const show=k=>{
+    [...tabs.children].forEach(b=>b.classList.toggle("on",b.dataset.k===k));
+    const e=m.months[k];let h='<div class="card"><h2>'+label(k)+'</h2><img src="'+e.schedule.file+'" alt="'+label(k)+'の月間スケジュール">';
+    (e.notices||[]).forEach(n=>{h+='<h2 style="margin-top:14px">'+esc(n.title)+'</h2><img src="'+n.file+'" alt="'+esc(n.title)+'">'});
+    view.innerHTML=h+'</div>';
+  };
+  keys.forEach(k=>{const b=document.createElement("button");b.dataset.k=k;
+    b.textContent=(k===cur?"今月 ":k===next?"来月 ":"")+label(k);b.onclick=()=>show(k);tabs.appendChild(b)});
+  if(keys.length) show(keys[0]);
+  const fl=Object.values(m.flyers||{}).filter(f=>f.months[1]>=cur).sort((a,b)=>a.months[0]<b.months[0]?-1:1);
+  if(fl.length) document.getElementById("flyers").innerHTML='<div class="card"><h2>🖨 2か月分のお知らせ（A4）</h2>'+
+    fl.map(f=>'<p><a href="'+f.pdf+'">'+esc(f.title)+'（印刷用 PDF）</a></p><img src="'+f.file+'" alt="'+esc(f.title)+'">').join("")+'</div>';
+}).catch(()=>{document.getElementById("view").innerHTML='<div class="card">まだスケジュールがありません。</div>'});
+</script></body></html>
