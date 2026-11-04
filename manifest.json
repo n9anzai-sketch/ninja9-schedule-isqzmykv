@@ -6,8 +6,21 @@
     "preview": "files/2026-11_schedule_cba1f9a1_s.jpg"
    },
    "notices": []
+  },
+  "2026-12": {
+   "schedule": {
+    "file": "files/2026-12_schedule_5851f8b7.png",
+    "preview": "files/2026-12_schedule_5851f8b7_s.jpg"
+   },
+   "notices": [
+    {
+     "title": "年末年始休業のお知らせ",
+     "file": "files/2026-12_notice1_c0812cf3.png",
+     "preview": "files/2026-12_notice1_c0812cf3_s.jpg"
+    }
+   ]
   }
  },
  "flyers": {},
- "updated": "2026-11-04 15:55"
+ "updated": "2026-11-04 15:56"
 }
